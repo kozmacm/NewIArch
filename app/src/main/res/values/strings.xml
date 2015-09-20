@@ -1,0 +1,82 @@
+<resources>
+    <string name="app_name">NewIArch</string>
+    <string name="hello_world">Hello world!</string>
+    <!-- Map strings -->
+    <string name="map_pins">Display map pins</string>
+
+    <!-- Take Picture / Meta data entry -->
+    <string name="project_hint">Project Name</string>
+    <string name="location_hint">Location</string>
+    <string name="artifact_hint">Artifact</string>
+    <string name="description_hint">Description</string>
+    <string name="date">Date</string>
+    <string name="gps">GPS</string>
+    <string name="sync">Sync to Dropbox</string>
+    <string name="image">Image</string>
+    <string name="new_project">New Project</string>
+
+    <!-- Main Screen Buttons -->
+    <string name="camera">Camera</string>
+    <string name="map">Map</string>
+    <string name="project_management">Project Management</string>
+    <string name="options">Options</string>
+    <string name="button_send">Connect to Dropbox</string>
+
+    <!-- Navigation Drawer -->
+    <string-array name="nav_drawer_items_array">
+        <item>Camera</item>
+        <item>Map</item>
+        <item>Project Management</item>
+        <!-- <item>Options</item> -->
+        <item>Logout</item>
+    </string-array>
+    <string name="drawer_open">iArch</string>
+    <string name="drawer_close">Close navigation drawer</string>
+
+    <!-- Action bar -->
+    <string name="action_home">Home</string>
+    <string name="action_camera">Camera</string>
+    <string name="action_projects">Projects</string>
+    <string name="action_gallery">Gallery</string>
+    <string name="action_sync">Sync Project</string>
+    <string name="action_export_project">Export CSV</string>
+    <string name="action_search">Search</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_share">Share Image</string>
+    <string name="action_delete_image">Delete Image</string>
+    <string name="action_delete_project">Delete Project</string>
+    <string name="action_delete_multiple">Delete Selected</string>
+    <string name="title_fragment_take_picture">Camera</string>
+    <string name="title_fragment_display_map">Map</string>
+    <string name="title_fragment_gallery">Gallery</string>
+    <string name="title_fragment_image_details">Image Details</string>
+    <string name="title_fragment_chooser">Projects</string>
+    <string name="title_fragment_main">iArch</string>
+
+    <!-- Dialog Handlers -->
+    <string name="title_delete">Really delete?</string>
+    <string name="title_add">Enter New Project Name</string>
+
+    <!-- Artifacts -->
+    <string-array name="artifacts">
+        <item>Bead</item>
+        <item>Brick</item>
+        <item>Coin</item>
+        <item>Pottery</item>
+        <item>Lithic</item>
+        <item>Glass</item>
+        <item>Metal</item>
+        <item>Inscription</item>
+        <item>Other Artifact</item>
+        <item>Clay</item>
+        <item>Shell</item>
+        <item>Charcoal</item>
+        <item>Bone</item>
+        <item>Wood</item>
+        <item>Stone</item>
+        <item>Other Ecofact</item>
+    </string-array>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

@@ -1,0 +1,33 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+    </style>
+
+    <style name="spinner_style" parent="@android:style/Theme.Holo">
+        <item name="android:spinnerItemStyle">@style/SpinnerItem</item>
+        <item name="android:spinnerDropDownItemStyle">@style/SpinnerDropDownItem</item>
+        <item name="android:dropDownListViewStyle">@style/dropdownList</item>
+    </style>
+
+    <style name="SpinnerItem" parent="@android:style/Theme.Holo">
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:background">@android:color/black</item>
+        <!--item name="android:padding">10dp</item>-->
+        <item name="android:textSize">22sp</item>
+    </style>
+    <style name="SpinnerDropDownItem" parent="@android:style/Theme.Holo">
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:background">@android:color/black</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:textSize">22sp</item>
+    </style>
+    <style name="dropdownList" parent="android:Widget.ListView.DropDown">
+        <item name="android:divider">#FFFFFF</item>
+        <item name="android:dividerHeight">1dp</item>
+        <!--item name="android:padding">10dp</item>-->
+        <item name="android:textSize">22sp</item>
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+</resources>
