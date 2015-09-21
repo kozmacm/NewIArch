@@ -1,10 +1,10 @@
 package com.github.newiarch;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -18,7 +18,7 @@ import com.dropbox.client2.android.AndroidAuthSession;
 import com.dropbox.client2.session.AccessTokenPair;
 import com.dropbox.client2.session.AppKeyPair;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
 
     final static private String APP_KEY = "fapxgsf7glvwkb0";
     final static private String APP_SECRET = "1swwbsarfhraqab";
@@ -26,48 +26,36 @@ public class MainActivity extends AppCompatActivity {
     private static final String ACCESS_KEY_NAME = "ACCESS_KEY";
     private static final String ACCESS_SECRET_NAME = "ACCESS_SECRET";
     private boolean mLoggedIn;
-
-    //Android widgets
     static Button mLinkButton;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if (savedInstanceState == null) {
+            getFragmentManager().beginTransaction()
+                    .add(R.id.container, new MainActivityFragment())
+                    .commit();
+        }
+
         //Create a new AuthSession so that we can use the Dropbox API
         AndroidAuthSession session = buildSession();
         mDBApi = new DropboxAPI<AndroidAuthSession>(session);
-
-        //Basic Android widgets
-        mLinkButton = (Button)findViewById(R.id.link_button);
-
-        mLinkButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                // This logs you out if you're logged in, or vice versa
-                if (mLoggedIn) {
-                    logOut();
-                } else {
-                    // Start the remote authentication
-                    mDBApi.getSession().startOAuth2Authentication(MainActivity.this);
-                }
-            }
-        });
-
-        //Display the proper UI state if logged in or not
-        setLoggedIn(mDBApi.getSession().isLinked());
     }
 
     protected void onResume() {
         super.onResume();
         AndroidAuthSession session = mDBApi.getSession();
+        mLinkButton = (Button) findViewById(R.id.link_button);
 
         if (session.authenticationSuccessful()) {
             try {
                 // Required to complete auth, sets the access token on the session
                 session.finishAuthentication();
                 storeAuth(session);
-                setLoggedIn(true);
+                mLinkButton.setText("Unlink from Dropbox");
             } catch (IllegalStateException e) {
                 Log.i("DbAuthLog", "Error authenticating", e);
             }
@@ -96,31 +84,6 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void logOut() {
-        // Remove credentials from the session
-        mDBApi.getSession().unlink();
-
-        // Clear our stored keys
-        clearKeys();
-        // Change UI state to display logged out version
-        setLoggedIn(false);
-    }
-
-    /**
-     * Convenience function to change UI state based on being logged in
-     */
-    private void setLoggedIn(boolean loggedIn) {
-        mLoggedIn = loggedIn;
-        if (loggedIn) {
-            mLinkButton.setText("Unlink from Dropbox");
-            //mDisplay.setVisibility(View.VISIBLE);
-        } else {
-            mLinkButton.setText("Link with Dropbox");
-            //mDisplay.setVisibility(View.GONE);
-            //mImage.setImageDrawable(null);
-        }
-    }
-
     /**
      * Shows keeping the access keys returned from Trusted Authenticator in a local
      * store, rather than storing user name & password, and re-authenticating each
@@ -131,14 +94,7 @@ public class MainActivity extends AppCompatActivity {
         String key = sharedPref.getString(ACCESS_KEY_NAME, null);
         String secret = sharedPref.getString(ACCESS_SECRET_NAME, null);
         if (key == null || secret == null || key.length() == 0 || secret.length() == 0) return;
-
-        if (key.equals("oauth2:")) {
-            // If the key is set to "oauth2:", then we can assume the token is for OAuth 2.
-            session.setOAuth2AccessToken(secret);
-        } else {
-            // Still support using old OAuth 1 tokens.
-            session.setAccessTokenPair(new AccessTokenPair(key, secret));
-        }
+        session.setOAuth2AccessToken(secret);
     }
 
     /**
@@ -182,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
 
             // Replace whatever is in the fragment_container view with this fragment,
             // and add the transaction to the back stack
-            transaction.replace(R.id.fragment, newFragment);
+            transaction.replace(R.id.container, newFragment);
             transaction.addToBackStack(null);
 
             // Commit the transaction
