@@ -10,9 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-/**
- * A placeholder fragment containing a simple view.
- */
 public class MainActivityFragment extends Fragment {
 
     private boolean mLoggedIn;
@@ -37,13 +34,6 @@ public class MainActivityFragment extends Fragment {
             }
         });
 
-        //make sure dropbox button is displaying correct text
-        if (MainActivity.mDBApi.getSession().isLinked()) {
-            showLinkedView();
-        } else {
-            showUnlinkedView();
-        }
-
         //Display the proper UI state if logged in or not
         setLoggedIn(MainActivity.mDBApi.getSession().isLinked());
 
@@ -63,14 +53,6 @@ public class MainActivityFragment extends Fragment {
             // Start the remote authentication
             MainActivity.mDBApi.getSession().startOAuth2Authentication(getActivity());
         }
-    }
-
-    private void showLinkedView() {
-        mLinkButton.setText("Unlink from Dropbox");
-    }
-
-    private void showUnlinkedView() {
-        mLinkButton.setText("Connect to Dropbox");
     }
 
     private void logOut() {

@@ -25,7 +25,6 @@ public class MainActivity extends Activity {
     static DropboxAPI<AndroidAuthSession> mDBApi;
     private static final String ACCESS_KEY_NAME = "ACCESS_KEY";
     private static final String ACCESS_SECRET_NAME = "ACCESS_SECRET";
-    private boolean mLoggedIn;
     static Button mLinkButton;
 
 
@@ -112,13 +111,6 @@ public class MainActivity extends Activity {
             editor.putString(ACCESS_SECRET_NAME, accessToken);
             editor.commit();
         }
-    }
-
-    private void clearKeys() {
-        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
-        SharedPreferences.Editor edit = sharedPref.edit();
-        edit.clear();
-        edit.commit();
     }
 
     private AndroidAuthSession buildSession() {
