@@ -1,17 +1,20 @@
 package com.github.newiarch;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.os.Environment;
@@ -46,7 +49,7 @@ import java.util.Vector;
 
 
 public class TakePictureFragment extends Fragment
-    implements View.OnClickListener, AdapterView.OnItemSelectedListener {
+        implements View.OnClickListener, AdapterView.OnItemSelectedListener {
     public static final int MEDIA_TYPE_IMAGE = 1;
     private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
     private Uri fileUri;
@@ -91,7 +94,7 @@ public class TakePictureFragment extends Fragment
 
         getProjectsForSpinner();
         pSpinner = (Spinner) view.findViewById(R.id.project_name);
-        ArrayAdapter<String> pAdapter = new ArrayAdapter< >(getActivity(), R.layout.spinner_layout, list);
+        ArrayAdapter<String> pAdapter = new ArrayAdapter<>(getActivity(), R.layout.spinner_layout, list);
         //ArrayAdapter<CharSequence> pAdapter = ArrayAdapter.createFromResource(getActivity(), R.array.artifacts, R.layout.spinner_layout);
         pAdapter.setDropDownViewResource(R.layout.spinner_dropdown_layout);
         pSpinner.setPrompt("Select your Project");
@@ -109,7 +112,7 @@ public class TakePictureFragment extends Fragment
             //create Intent to take a picture
             Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
-            //getLocation();
+            getLocation();
             getDate();
 
             //Ensure there is a camera activity to handle intent
@@ -188,8 +191,8 @@ public class TakePictureFragment extends Fragment
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         //stop getting location updates; saves battery
-        //stopLocation();
-        //fileLocation = fileUri.getPath();
+        stopLocation();
+
         if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
             //show picture that was taken
             setPic(fileLocation);
@@ -251,7 +254,6 @@ public class TakePictureFragment extends Fragment
             mediaFile = new File(mediaStorageDir.getPath() + File.separator +
                     "IMG_" + timeStamp + ".jpg");
         } else {
-            //System.out.println("TRYING TO FIND THE RANDOM CRASH");
             return null;
         }
 
@@ -489,7 +491,7 @@ public class TakePictureFragment extends Fragment
     void getDate() {
         date = new SimpleDateFormat("EEE, MMM dd, yyyy HH:mm:ss z").format(new Date());
     }
-/*
+
     void getLocation() {
         //acquire a reference to system location manager
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
@@ -498,6 +500,18 @@ public class TakePictureFragment extends Fragment
         //check to see if last known location exists
         if (locationManager != null) {
             //set cached last known location to current location for initial state
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (getActivity().checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && getActivity().checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    public void requestPermissions(@NonNull String[] permissions, int requestCode)
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for Activity#requestPermissions for more details.
+                    return;
+                }
+            }
             lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
             if (lastKnownLocation != null) {
                 latitude = lastKnownLocation.getLatitude();
@@ -546,11 +560,23 @@ public class TakePictureFragment extends Fragment
         if (locationManager != null) {
             if (locationListener != null) {
                 //stop looking for location updates; saves battery
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (getActivity().checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && getActivity().checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        // TODO: Consider calling
+                        //    public void requestPermissions(@NonNull String[] permissions, int requestCode)
+                        // here to request the missing permissions, and then overriding
+                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                        //                                          int[] grantResults)
+                        // to handle the case where the user grants the permission. See the documentation
+                        // for Activity#requestPermissions for more details.
+                        return;
+                    }
+                }
                 locationManager.removeUpdates(locationListener);
             }
         }
     }
-*/
+
     @Override
     public void onClick(View v) {
         syncToDropbox();
