@@ -54,7 +54,7 @@ public class MainActivity extends Activity {
                 // Required to complete auth, sets the access token on the session
                 session.finishAuthentication();
                 storeAuth(session);
-                //mLinkButton.setText("Unlink from Dropbox");
+                mLinkButton.setText("Unlink from Dropbox");
             } catch (IllegalStateException e) {
                 Log.i("DbAuthLog", "Error authenticating", e);
             }
