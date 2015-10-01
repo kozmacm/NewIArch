@@ -30,16 +30,23 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.dropbox.client2.DropboxAPI;
+import com.dropbox.client2.exception.DropboxException;
+
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Vector;
 
 
 public class TakePictureFragment extends Fragment
-    implements DialogInterface.OnClickListener, AdapterView.OnItemSelectedListener {
+    implements View.OnClickListener, AdapterView.OnItemSelectedListener {
     public static final int MEDIA_TYPE_IMAGE = 1;
     private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
     private Uri fileUri;
@@ -84,19 +91,19 @@ public class TakePictureFragment extends Fragment
 
         getProjectsForSpinner();
         pSpinner = (Spinner) view.findViewById(R.id.project_name);
-        ArrayAdapter<String> pAdapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_layout, list);
+        ArrayAdapter<String> pAdapter = new ArrayAdapter< >(getActivity(), R.layout.spinner_layout, list);
         //ArrayAdapter<CharSequence> pAdapter = ArrayAdapter.createFromResource(getActivity(), R.array.artifacts, R.layout.spinner_layout);
         pAdapter.setDropDownViewResource(R.layout.spinner_dropdown_layout);
         pSpinner.setPrompt("Select your Project");
-        //pSpinner.setAdapter(
-          //      new NothingSelectedSpinnerAdapter(
-            //            pAdapter,
-              //          R.layout.project_spinner_row_nothing_selected,
-                        // R.layout.project_spinner_row_nothing_selected_dropdown, //Optional
-                //        getActivity()));
+        pSpinner.setAdapter(
+                new NothingSelectedSpinnerAdapter(
+                        pAdapter,
+                        R.layout.project_spinner_row_nothing_selected,
+                        //R.layout.project_spinner_row_nothing_selected, //Optional
+                        getActivity()));
 
         dropboxButton = (Button) view.findViewById(R.id.sync);
-        //dropboxButton.setOnClickListener(this);
+        dropboxButton.setOnClickListener(this);
 
         if (savedInstanceState == null) {
             //create Intent to take a picture
@@ -117,8 +124,13 @@ public class TakePictureFragment extends Fragment
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
 
                     //start the image capture Intent
-                    startActivityForResult(takePictureIntent,CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
+                    startActivityForResult(takePictureIntent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
                 }
+            }
+        } else {
+            //savedInstanceState is not null
+            if (savedInstanceState.containsKey("camera_image")) {
+                fileLocation = savedInstanceState.getString("camera_image");
             }
         }
 
@@ -152,7 +164,7 @@ public class TakePictureFragment extends Fragment
     public void onPause() {
         super.onPause();  // Always call the superclass method first
         //delete photo if back button was pressed on TakePicture after taking photo
-        if (isRemoving() && fileSynced == false) {
+        if (isRemoving() && !fileSynced) {
             if (fileLocation != null) {
                 Toast.makeText(getActivity(), "Back button pressed, deleting image", Toast.LENGTH_SHORT).show();
                 File myFile = new File(fileLocation);
@@ -177,7 +189,7 @@ public class TakePictureFragment extends Fragment
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         //stop getting location updates; saves battery
         //stopLocation();
-
+        //fileLocation = fileUri.getPath();
         if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
             //show picture that was taken
             setPic(fileLocation);
@@ -191,7 +203,7 @@ public class TakePictureFragment extends Fragment
             TextView longText = (TextView) view.findViewById(R.id.longitude);
             longText.setText("Longitude: " + longitude);
 
-        } else if (resultCode == RESULT_CANCELED){
+        } else if (resultCode == RESULT_CANCELED) {
             //user cancelled the image capture
             fileSynced = false;
             getActivity().getFragmentManager().popBackStack();
@@ -201,30 +213,33 @@ public class TakePictureFragment extends Fragment
         }
     }
 
-    public void onItemSelected(AdapterView<?> parent, View view, int pos, long id)
-    {
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+
+        if (fileLocation != null)
+            savedInstanceState.putString("camera_image", fileLocation);
+
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
 
     }
 
-    public void onNothingSelected(AdapterView<?> parent)
-    {
+    public void onNothingSelected(AdapterView<?> parent) {
 
     }
 
-    private static Uri getOutputMediaFileUri(int type)
-    {
+    private static Uri getOutputMediaFileUri(int type) {
         return Uri.fromFile(getOutputMediaFile(type));
 
     }
 
-    private static File getOutputMediaFile(int type)
-    {
+    private static File getOutputMediaFile(int type) {
         File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES), "iArch");
-        if(! mediaStorageDir.exists())
-        {
-            if(! mediaStorageDir.mkdirs())
-            {
+        if (!mediaStorageDir.exists()) {
+            if (!mediaStorageDir.mkdirs()) {
                 Log.d("iArch", "failed to create directory");
                 return null;
             }
@@ -232,22 +247,18 @@ public class TakePictureFragment extends Fragment
 
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         File mediaFile;
-        if(type == MEDIA_TYPE_IMAGE)
-        {
+        if (type == MEDIA_TYPE_IMAGE) {
             mediaFile = new File(mediaStorageDir.getPath() + File.separator +
                     "IMG_" + timeStamp + ".jpg");
-        }
-        else
-        {
-            System.out.println("TRYING TO FIND THE RANDOM CRASH");
+        } else {
+            //System.out.println("TRYING TO FIND THE RANDOM CRASH");
             return null;
         }
 
         return mediaFile;
     }
 
-    private void capturePictureData()
-    {
+    private void capturePictureData() {
         //prevent crash when nothing is selected on spinner
         if (pSpinner.getSelectedItem() != null) {
             projectName = pSpinner.getSelectedItem().toString();
@@ -271,9 +282,9 @@ public class TakePictureFragment extends Fragment
         description = descriptionEditText.getText().toString();
 
     }
-/*
+
     //sync to dropbox click
-    public void syncToDropbox()	{
+    public void syncToDropbox() {
         String[] splitLoc = fileLocation.split("/");
         capturePictureData();
 
@@ -288,10 +299,8 @@ public class TakePictureFragment extends Fragment
             File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "iArch/" + projectName);
             //new file to move to
             newFileLocation = new File(mediaStorageDir.toString() + "/" + splitLoc[6]);
-            if(! mediaStorageDir.exists())
-            {
-                if(! mediaStorageDir.mkdirs())
-                {
+            if (!mediaStorageDir.exists()) {
+                if (!mediaStorageDir.mkdirs()) {
                     Log.d("iArch/" + projectName, " failed to create directory");
                 }
             }
@@ -299,11 +308,9 @@ public class TakePictureFragment extends Fragment
             myFile.renameTo(newFileLocation);
 
             //sync picture with dropbox upon clicking sync button
-            if (MainActivity.mAccountManager.hasLinkedAccount())
-            {
+            if (MainActivity.mDBApi.getSession().isLinked()) {
                 Boolean syncCorrectly = dropboxStuff(fileLocation);
-                if (syncCorrectly)
-                {
+                if (syncCorrectly) {
                     fileSynced = true;
                     getActivity().getFragmentManager().popBackStack();
                 }
@@ -314,12 +321,52 @@ public class TakePictureFragment extends Fragment
     }
 
     private Boolean dropboxStuff(String file) {
-        try {
-            // Get the data entered into the textboxes
-            capturePictureData();
-            //shorten path
-            String[] splitFile = file.split("/");
+        // Get the data entered into the textboxes
+        //capturePictureData();
+        //shorten path
+        String[] splitFile = file.split("/");
+        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "iArch/" + projectName);
+        File[] files = new File[1];
+        files[0] = new File(mediaStorageDir + "/" + splitFile[6]);
 
+        Upload upload = new Upload(getActivity(), MainActivity.mDBApi, projectName + "/", files);
+        upload.execute();
+
+        if (upload.getStatus() == Upload.Status.PENDING) {
+            // My AsyncTask has not started yet
+            Log.i("Status pend",
+                    " " + upload.getStatus());
+        }
+
+        if (upload.getStatus() == Upload.Status.RUNNING) {
+            // My AsyncTask is currently doing work in
+            // doInBackground()
+            Log.i("Status run ",
+                    " " + upload.getStatus());
+        }
+
+        if (upload.getStatus() == Upload.Status.FINISHED) {
+            Log.i("Status Finished",
+                    " " + upload.getStatus());
+            // My AsyncTask is done and onPostExecute
+            // was called
+        }
+
+        /*
+        File myFile = new File(splitFile[6]);
+        try {
+            FileInputStream inputStream = new FileInputStream(file);
+            try {
+                DropboxAPI.Entry response = MainActivity.mDBApi.putFile(splitFile[6], inputStream, file.length(), null, null);
+                Log.i("DBExampleLog", "The uploaded file's rev is: " + response.rev);
+            } catch (DropboxException e) {
+                e.printStackTrace();
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+*/
+/*
             //get link from dropbox and create remote path for sync; create datastore
             DbxFileSystem dbxFs = DbxFileSystem.forAccount(MainActivity.mAccountManager.getLinkedAccount());
             DbxFile testFile;
@@ -382,10 +429,11 @@ public class TakePictureFragment extends Fragment
             e.printStackTrace();
         }
 
-        return false;
+*/
+        return true;
 
     }
-*/
+
     private void setPic(String file) {
         //get dimensions of view
         ImageView myImage = (ImageView) view.findViewById(R.id.imageView1);
@@ -415,7 +463,8 @@ public class TakePictureFragment extends Fragment
         return BitmapFactory.decodeFile(file, options);
     }
 
-    @SuppressLint("SimpleDateFormat") public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+    @SuppressLint("SimpleDateFormat")
+    public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
         // Raw height and width of image
         final int height = options.outHeight;
         final int width = options.outWidth;
@@ -437,8 +486,7 @@ public class TakePictureFragment extends Fragment
         return inSampleSize;
     }
 
-    void getDate()
-    {
+    void getDate() {
         date = new SimpleDateFormat("EEE, MMM dd, yyyy HH:mm:ss z").format(new Date());
     }
 /*
@@ -503,16 +551,20 @@ public class TakePictureFragment extends Fragment
         }
     }
 */
+    @Override
+    public void onClick(View v) {
+        syncToDropbox();
+    }
 
     static void getProjectsForSpinner() {
-        list = new ArrayList<String>();
+        list = new ArrayList< >();
         File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES), "iArch");
         File[] projectList = mediaStorageDir.listFiles();
         if (projectList != null) {
-            for (int i=0; i<projectList.length; i++) {
+            for (int i = 0; i < projectList.length; i++) {
                 System.out.println("LIST: " + projectList[i].toString());
-                if (projectList[i].isDirectory()){
+                if (projectList[i].isDirectory()) {
                     String[] splitList = projectList[i].toString().split("/");
                     list.add(splitList[6]);
                 }
@@ -523,9 +575,11 @@ public class TakePictureFragment extends Fragment
         }
     }
 
-    /** Determines whether one Location reading is better than the current Location fix
-     * @param location  The new Location that you want to evaluate
-     * @param currentBestLocation  The current Location fix, to which you want to compare the new one
+    /**
+     * Determines whether one Location reading is better than the current Location fix
+     *
+     * @param location            The new Location that you want to evaluate
+     * @param currentBestLocation The current Location fix, to which you want to compare the new one
      */
     protected boolean isBetterLocation(Location location, Location currentBestLocation) {
         if (currentBestLocation == null) {
@@ -569,17 +623,13 @@ public class TakePictureFragment extends Fragment
         return false;
     }
 
-    /** Checks whether two providers are the same */
+    /**
+     * Checks whether two providers are the same
+     */
     private boolean isSameProvider(String provider1, String provider2) {
         if (provider1 == null) {
             return provider2 == null;
         }
         return provider1.equals(provider2);
-    }
-
-    @Override
-    public void onClick(DialogInterface dialog, int which) {
-        //dropbox button click event
-        //syncToDropbox();
     }
 }

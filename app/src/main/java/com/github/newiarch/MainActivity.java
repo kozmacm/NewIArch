@@ -41,7 +41,7 @@ public class MainActivity extends Activity {
 
         //Create a new AuthSession so that we can use the Dropbox API
         AndroidAuthSession session = buildSession();
-        mDBApi = new DropboxAPI<AndroidAuthSession>(session);
+        mDBApi = new DropboxAPI< >(session);
     }
 
     protected void onResume() {
@@ -54,7 +54,7 @@ public class MainActivity extends Activity {
                 // Required to complete auth, sets the access token on the session
                 session.finishAuthentication();
                 storeAuth(session);
-                mLinkButton.setText("Unlink from Dropbox");
+                //mLinkButton.setText("Unlink from Dropbox");
             } catch (IllegalStateException e) {
                 Log.i("DbAuthLog", "Error authenticating", e);
             }
@@ -141,4 +141,12 @@ public class MainActivity extends Activity {
                     Toast.LENGTH_LONG).show();
         }
     }
+
+    //create a new project for TakePictureFragment project name dropdown
+    public void newProject(View v) {
+       	//TakePictureFragment.newProject(v);
+       	AddDialogHandler dialogHandler = new AddDialogHandler();
+    	dialogHandler.show(this.getFragmentManager(), "addImage");
+    }
+
 }
