@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -327,47 +328,35 @@ public class TakePictureFragment extends Fragment
         //capturePictureData();
         //shorten path
         String[] splitFile = file.split("/");
-        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "iArch/" + projectName);
-        File[] files = new File[1];
-        files[0] = new File(mediaStorageDir + "/" + splitFile[6]);
 
-        Upload upload = new Upload(getActivity(), MainActivity.mDBApi, projectName + "/", files);
-        upload.execute();
+        //File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "iArch/" + projectName);
+        //File[] files = new File[1];
+        //files[0] = new File(mediaStorageDir + "/" + splitFile[6]);
+        //Fragment fragment = new UploadDialog();
 
-        if (upload.getStatus() == Upload.Status.PENDING) {
-            // My AsyncTask has not started yet
-            Log.i("Status pend",
-                    " " + upload.getStatus());
+        UploadDialog loadDialog = new UploadDialog();
+        Bundle bundle = new Bundle();
+        bundle.putStringArray("EXTRAS_SPLITFILE", splitFile);
+        bundle.putString("EXTRAS_PROJECTNAME", projectName);
+        loadDialog.setArguments(bundle);
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+
+        loadDialog = (UploadDialog) getFragmentManager().findFragmentByTag(UploadDialog.TAG);
+        if (loadDialog != null) {
+            Log.i("Attatching UploadDialog", "");
+            transaction.attach(loadDialog);
+        } else {
+            loadDialog = UploadDialog.newInstance();
+
+            Log.i("Adding new UploadDialog", "");
+            transaction.add(loadDialog, UploadDialog.TAG);
         }
+        transaction.commit();
 
-        if (upload.getStatus() == Upload.Status.RUNNING) {
-            // My AsyncTask is currently doing work in
-            // doInBackground()
-            Log.i("Status run ",
-                    " " + upload.getStatus());
-        }
 
-        if (upload.getStatus() == Upload.Status.FINISHED) {
-            Log.i("Status Finished",
-                    " " + upload.getStatus());
-            // My AsyncTask is done and onPostExecute
-            // was called
-        }
 
-        /*
-        File myFile = new File(splitFile[6]);
-        try {
-            FileInputStream inputStream = new FileInputStream(file);
-            try {
-                DropboxAPI.Entry response = MainActivity.mDBApi.putFile(splitFile[6], inputStream, file.length(), null, null);
-                Log.i("DBExampleLog", "The uploaded file's rev is: " + response.rev);
-            } catch (DropboxException e) {
-                e.printStackTrace();
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-*/
+
+
 /*
             //get link from dropbox and create remote path for sync; create datastore
             DbxFileSystem dbxFs = DbxFileSystem.forAccount(MainActivity.mAccountManager.getLinkedAccount());

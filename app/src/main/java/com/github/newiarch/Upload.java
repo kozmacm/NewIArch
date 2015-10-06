@@ -36,6 +36,7 @@ public class Upload extends AsyncTask<Void, Long, Boolean> {
     private int mFilesUploaded;
     private File[] mFilesToUpload;
     private int mCurrentFileIndex;
+    UploadDialog.UploadDialogCallback mUploadDialogCallback;
 
     int totalBytes = 0, indBytes = 0;
 
@@ -67,6 +68,11 @@ public class Upload extends AsyncTask<Void, Long, Boolean> {
             }
         });
         mDialog.show();
+    }
+
+    public void setCallback(
+            UploadDialog.UploadDialogCallback uploadDialogCallback) {
+        this.mUploadDialogCallback = uploadDialogCallback;
     }
 
     @Override
@@ -164,7 +170,7 @@ public class Upload extends AsyncTask<Void, Long, Boolean> {
     protected void onProgressUpdate(Long... progress) {
 
         mDialog.setMessage("Uploading file " + (mCurrentFileIndex + 1) + " / "
-                + mFilesToUpload.length+"\n"+filename);
+                + mFilesToUpload.length + "\n" +filename);
         int percent = (int) (100.0 * (double) progress[0] / indBytes + 0.5);
         Log.i("pro", percent + "    " + progress[0] + "/" + indBytes);
         mDialog.setProgress(percent);
@@ -184,4 +190,5 @@ public class Upload extends AsyncTask<Void, Long, Boolean> {
         Toast error = Toast.makeText(mContext, msg, Toast.LENGTH_LONG);
         error.show();
     }
+
 }
