@@ -26,6 +26,7 @@ public class MainActivity extends Activity {
     private static final String ACCESS_KEY_NAME = "ACCESS_KEY";
     private static final String ACCESS_SECRET_NAME = "ACCESS_SECRET";
     static Button mLinkButton;
+    static String[] toBeUploaded = new String[0];
 
 
     @Override
@@ -148,5 +149,27 @@ public class MainActivity extends Activity {
        	AddDialogHandler dialogHandler = new AddDialogHandler();
     	dialogHandler.show(this.getFragmentManager(), "addImage");
     }
+
+    public void gallery(View view)
+    {
+        // Create new fragment and transaction
+        Fragment newFragment = new ChooserFragment();
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+
+        // Replace whatever is in the fragment_container view with this fragment,
+        // and add the transaction to the back stack
+        transaction.replace(R.id.container, newFragment);
+        transaction.addToBackStack(null);
+
+        // Commit the transaction
+        transaction.commit();
+    }
+
+
+
+
+
+
+
 
 }

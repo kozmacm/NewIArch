@@ -27,7 +27,6 @@ public class Upload extends AsyncTask<Void, Long, Boolean> {
 
     private DropboxAPI.UploadRequest mRequest;
     private Context mContext;
-    //private ProgressDialog mDialog;
 
     static String mErrorMsg,filename;
     UploadDialog.UploadTaskCallback mUploadTaskCallback;
