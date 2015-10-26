@@ -66,11 +66,8 @@ public class UploadDialog extends DialogFragment {
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //setStyle(SherlockDialogFragment.STYLE_NORMAL, R.style.TuriosDialog);
-        String[] splitFile = files.split("/");
 
-        //Testing... to be removed later
-        System.out.println("PROJECT NAME: " + projectName);
-        System.out.println("splitFile[6]: " + splitFile[6]);
+        String[] splitFile = files.split("/");
 
         // Retain this fragment across configuration changes.
         setRetainInstance(true);

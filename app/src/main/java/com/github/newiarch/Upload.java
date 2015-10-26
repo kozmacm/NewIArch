@@ -1,15 +1,9 @@
 package com.github.newiarch;
 
-import android.app.DialogFragment;
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
-import android.app.ProgressDialog;
+
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.dropbox.client2.DropboxAPI;
@@ -61,18 +55,6 @@ public class Upload extends AsyncTask<Void, Long, Boolean> {
             Long bytes = mFilesToUpload[i].length();
             totalBytes += bytes;
         }
-
-        //mDialog = new ProgressDialog(context);
-        //mDialog.setMax(100);
-        //mDialog.setMessage("Uploading file 1 / " + mFilesToUpload.length);
-        //mDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        //mDialog.setProgress(0);
-        //mDialog.setButton("Cancel", new DialogInterface.OnClickListener() {
-           // public void onClick(DialogInterface dialog, int which) {
-           //     cancel(true);
-           // }
-        //});
-        //mDialog.show();
     }
 
     @Override
@@ -168,9 +150,6 @@ public class Upload extends AsyncTask<Void, Long, Boolean> {
 
     @Override
     protected void onProgressUpdate(Long... progress) {
-
-        //mDialog.setMessage("Uploading file " + (mCurrentFileIndex + 1) + " / "
-        //        + mFilesToUpload.length + "\n" + filename);
         int percent = (int) (100.0 * (double) progress[0] / indBytes + 0.5);
         Log.i("pro", percent + "    " + progress[0] + "/" + indBytes);
         mUploadTaskCallback.onProgressUpdate(percent);
@@ -178,8 +157,6 @@ public class Upload extends AsyncTask<Void, Long, Boolean> {
 
     @Override
     protected void onPostExecute(Boolean result) {
-        //mDialog.dismiss();
-        //UploadDialog.dialog.dismiss();
         mUploadTaskCallback.onPostExecute();
         if (result) {
             showToast("Upload finished");

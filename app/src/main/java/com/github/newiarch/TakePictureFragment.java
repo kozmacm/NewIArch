@@ -327,20 +327,12 @@ public class TakePictureFragment extends Fragment
     private Boolean dropboxStuff(String file) {
         // Get the data entered into the textboxes
         //capturePictureData();
+
         myFile = file;
+
         //shorten path
         splitFile = file.split("/");
 
-        //File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "iArch/" + projectName);
-        //File[] files = new File[1];
-        //files[0] = new File(mediaStorageDir + "/" + splitFile[6]);
-        //Fragment fragment = new UploadDialog();
-
-        //UploadDialog loadDialog = new UploadDialog();
-        //Bundle bundle = new Bundle();
-        //bundle.putStringArray("EXTRAS_SPLITFILE", splitFile);
-        //bundle.putString("EXTRAS_PROJECTNAME", projectName);
-        //loadDialog.setArguments(bundle);
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         UploadDialog loadDialog = (UploadDialog) getFragmentManager().findFragmentByTag(UploadDialog.TAG);
         if (loadDialog != null) {
