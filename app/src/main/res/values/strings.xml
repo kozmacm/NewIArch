@@ -78,5 +78,6 @@
         <item>Stone</item>
         <item>Other Ecofact</item>
     </string-array>
+    <string name="title_activity_display_map_fragment">Map</string>
 
 </resources>

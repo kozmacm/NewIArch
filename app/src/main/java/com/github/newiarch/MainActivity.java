@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -148,6 +149,23 @@ public class MainActivity extends Activity {
        	//TakePictureFragment.newProject(v);
        	AddDialogHandler dialogHandler = new AddDialogHandler();
     	dialogHandler.show(this.getFragmentManager(), "addImage");
+    }
+
+    public void displayMap (View view) {
+        // Create new fragment and transaction
+        //Fragment newFragment = new DisplayMapFragment();
+        //FragmentTransaction transaction = getFragmentManager().beginTransaction();
+
+        // Replace whatever is in the fragment_container view with this fragment,
+        // and add the transaction to the back stack
+        //transaction.replace(R.id.container, newFragment);
+        //transaction.addToBackStack(null);
+
+        // Commit the transaction
+        //transaction.commit();
+
+        Intent intent = new Intent(this, DisplayMapFragment.class);
+        startActivity(intent);
     }
 
     public void gallery(View view)
