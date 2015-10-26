@@ -173,7 +173,7 @@ public class Upload extends AsyncTask<Void, Long, Boolean> {
         //        + mFilesToUpload.length + "\n" + filename);
         int percent = (int) (100.0 * (double) progress[0] / indBytes + 0.5);
         Log.i("pro", percent + "    " + progress[0] + "/" + indBytes);
-        UploadDialog.mProgressBar.setProgress(percent);
+        mUploadTaskCallback.onProgressUpdate(percent);
     }
 
     @Override
