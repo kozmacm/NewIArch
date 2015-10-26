@@ -57,7 +57,7 @@ public class TakePictureFragment extends Fragment
     static String fileLocation = null;
     static File newFileLocation;
     static private String date;
-    static private String projectName;
+    public static String projectName;
     static private String projectTitle; // same as projectName but it won't be modified
     static private String location;
     static private String artifact;
@@ -76,7 +76,8 @@ public class TakePictureFragment extends Fragment
     Spinner pSpinner;
     static List<String> list;
     private static final int TWO_MINUTES = 1000 * 60 * 2;
-
+    static String myFile;
+    static String[] splitFile;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -326,32 +327,33 @@ public class TakePictureFragment extends Fragment
     private Boolean dropboxStuff(String file) {
         // Get the data entered into the textboxes
         //capturePictureData();
+        myFile = file;
         //shorten path
-        String[] splitFile = file.split("/");
+        splitFile = file.split("/");
 
         //File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "iArch/" + projectName);
         //File[] files = new File[1];
         //files[0] = new File(mediaStorageDir + "/" + splitFile[6]);
         //Fragment fragment = new UploadDialog();
 
-        UploadDialog loadDialog = new UploadDialog();
-        Bundle bundle = new Bundle();
-        bundle.putStringArray("EXTRAS_SPLITFILE", splitFile);
-        bundle.putString("EXTRAS_PROJECTNAME", projectName);
-        loadDialog.setArguments(bundle);
+        //UploadDialog loadDialog = new UploadDialog();
+        //Bundle bundle = new Bundle();
+        //bundle.putStringArray("EXTRAS_SPLITFILE", splitFile);
+        //bundle.putString("EXTRAS_PROJECTNAME", projectName);
+        //loadDialog.setArguments(bundle);
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
-
-        loadDialog = (UploadDialog) getFragmentManager().findFragmentByTag(UploadDialog.TAG);
+        UploadDialog loadDialog = (UploadDialog) getFragmentManager().findFragmentByTag(UploadDialog.TAG);
         if (loadDialog != null) {
             Log.i("Attatching UploadDialog", "");
             transaction.attach(loadDialog);
         } else {
-            loadDialog = UploadDialog.newInstance();
+            loadDialog = UploadDialog.newInstance(projectName, myFile);
 
             Log.i("Adding new UploadDialog", "");
             transaction.add(loadDialog, UploadDialog.TAG);
         }
         transaction.commit();
+
 
 
 

@@ -18,11 +18,11 @@ public class UploadDialog extends DialogFragment {
 
     public static final String TAG = UploadDialog.class.getSimpleName();
     String projectName;
-    String[] files;
-    private Upload mTask;
-    private ProgressBar mProgressBar;
+    String files;
+    static Upload mTask;
+    static ProgressBar mProgressBar;
 
-    public interface UploadDialogCallback {
+    public interface UploadTaskCallback {
         void onPreExecute(int maxProgress);
 
         void onProgressUpdate(int progress);
@@ -32,8 +32,10 @@ public class UploadDialog extends DialogFragment {
         void onPostExecute();
     }
 
-    public static UploadDialog newInstance() {
+    public static UploadDialog newInstance(String projectName, String files) {
         UploadDialog taskFragment = new UploadDialog();
+        taskFragment.projectName = projectName;
+        taskFragment.files = files;
 
         return taskFragment;
     }
@@ -44,17 +46,12 @@ public class UploadDialog extends DialogFragment {
 
     @Override public View onCreateView(LayoutInflater inflater,
                                        ViewGroup container, Bundle savedInstanceState) {
-        Bundle bundle = this.getArguments();
-        if (bundle != null) {
-            projectName = bundle.getString("EXTRAS_PROJECTNAME");
-            files = bundle.getStringArray("EXTRAS_SPLITFILE");
-        }
         View view = inflater.inflate(R.layout.dialog_progress_task, container);
         mProgressBar = (ProgressBar) view.findViewById(R.id.progressBar);
         mProgressBar.setProgress(0);
         mProgressBar.setMax(100);
 
-        getDialog().setTitle(getActivity().getString(R.string.accept));
+        getDialog().setTitle("Uploading file 1 / " + Upload.mFilesToUpload.length);
         // This dialog can't be canceled by pressing the back key.
         getDialog().setCancelable(false);
         getDialog().setCanceledOnTouchOutside(false);
@@ -69,40 +66,49 @@ public class UploadDialog extends DialogFragment {
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //setStyle(SherlockDialogFragment.STYLE_NORMAL, R.style.TuriosDialog);
+        String[] splitFile = files.split("/");
+
+        //Testing... to be removed later
+        System.out.println("PROJECT NAME: " + projectName);
+        System.out.println("splitFile[6]: " + splitFile[6]);
 
         // Retain this fragment across configuration changes.
         setRetainInstance(true);
 
         File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "iArch/" + projectName);
-        File[] files = new File[1];
-        files[0] = new File(mediaStorageDir + "/" + files[0]);
-        mTask = new Upload(getActivity(), MainActivity.mDBApi, projectName + "/", files);
-        mTask.setCallback(new UploadDialogCallback() {
+        File[] theFiles = new File[1];
+        theFiles[0] = new File(mediaStorageDir + "/" + splitFile[6]);
+        mTask = new Upload(getActivity(), MainActivity.mDBApi, projectName + "/", theFiles);
+        mTask.setCallback(new UploadTaskCallback() {
 
-            @Override public void onPreExecute(int maxProgress) {
+            @Override
+            public void onPreExecute(int maxProgress) {
+
             }
 
-            @Override public void onProgressUpdate(int progress) {
+            @Override
+            public void onProgressUpdate(int progress) {
                 mProgressBar.setProgress(progress);
             }
 
-            @Override public void onPostExecute() {
+            @Override
+            public void onCancelled() {
                 if (isResumed())
                     dismiss();
 
                 mTask = null;
-
             }
 
-            @Override public void onCancelled() {
+            @Override
+            public void onPostExecute() {
                 if (isResumed())
                     dismiss();
 
                 mTask = null;
             }
         });
-
         mTask.execute();
+
         if (mTask.getStatus() == Upload.Status.PENDING) {
             // My AsyncTask has not started yet
             Log.i("Status pend",
@@ -161,4 +167,5 @@ public class UploadDialog extends DialogFragment {
             mTask.cancel(false);
 
     }
+
 }
